@@ -6,14 +6,6 @@ int main (void)
 {
 	int cha, i;
 	char *string = malloc (50 * sizeof *string);
-	
-
-//	while (cha = getchar(), cha != EOF) {
-
-//	printf ("%c", cha);
-//	}
-	
-	
 
 	for (i = 0 ; cha = getchar(), cha != ' '; i++)
 		string[i] = cha;
