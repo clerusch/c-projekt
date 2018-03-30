@@ -3,18 +3,6 @@
 #include <ctype.h>
 #include <errno.h>
 
-unsigned long filesize (FILE *filename)
-	//returns size of inputfile in bytes
-{
-	int i = 0, cipher;
-	
-
-	while (cipher = fgetc(filename), cipher != EOF)
-		i++;
-
-	return i;
-}
-
 int main (int argc, char **argv)
 {
 	
@@ -27,7 +15,7 @@ int main (int argc, char **argv)
 
 	//printf ("Read: %.*s\n", n, buf);
 
-	int destexists = !(access(argv[2],F_OK));
+	int destexists = !(access(argv[2],F_OK)); //access returns zero if file exists, -1 otherwise, so we have to negate to get the correct boolean
 	//printf ("destexists: %d\n", destexists);
 	
 
@@ -39,7 +27,7 @@ int main (int argc, char **argv)
 	}
 
 
-	FILE *source = fopen(argv[1], "rw");
+	FILE *source = fopen(argv[1], "r");
 	FILE *destination = fopen(argv[2], "w");
 	size_t n;	
 	do 
