@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <termbox.h>
 
@@ -54,7 +55,7 @@ static void update_obst(void)
 		}
 	}
 }
-static void update_jump(void)
+static int update_jump(void)
 {
 
 			if (player_y < GAME_Y -1) 
@@ -65,6 +66,8 @@ static void update_jump(void)
 					player_y--;
 					playerpos[player_y][player_x] = true;
 					tb_put_cell(player_x, player_y, &player);
+				if (player_y == GAME_Y - 4) return 0;
+				else return 1;
 				}
 			}
 }
@@ -191,6 +194,7 @@ int main(void)
 	// Game loop
 	struct tb_event e;
 	clock_t timeanf;
+	int steigen;
 	double timediff, random, counter1 = 0, counter2 = 0;
 
 
@@ -224,7 +228,9 @@ int main(void)
 
 		if (counter2 > 0.001) { 
 			update_obst();
-			update_jump();
+
+
+
 
 			counter2 = 0;
 		}
@@ -245,17 +251,18 @@ int main(void)
 
 
 
-		//checken, ob kollision: sehr naiv, weil testet einfach jede runde sämtliche wahrheitswerte gegeneinander hier ist ein besserer algorithmus gefragt
-		//for (i = 0; i < GAME_Y; i++)
-		//	for (j=0; j< GAME_X; j++)
-		//		if (player[x][y] && obst[x][y]) {
-		//			tb_print ("GAME OVER!");
-		//			sleep(3);
-		//			goto shutdown_tb;
-		//		}
 
 
 		tb_present();
+
+		for (int y = 0; y <= GAME_Y; y++)
+			for (int x = 0; x<= GAME_X; x++)
+				if (playerpos[y][x] && obst[y][x]) {
+		//			tb_print ("GAME OVER!");
+					sleep(3);
+					goto shutdown_tb;
+				}
+
 	}
 
 shutdown_tb:
