@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <termbox.h>
 
@@ -54,7 +55,7 @@ static void update_obst(void)
 		}
 	}
 }
-static void update_jump(void)
+int update_jump(void)
 {
 
 			if (player_y < GAME_Y -1) 
@@ -65,25 +66,32 @@ static void update_jump(void)
 					player_y--;
 					playerpos[player_y][player_x] = true;
 					tb_put_cell(player_x, player_y, &player);
+                   
 				}
-			}
+			} 
+			if (player_y == (GAME_Y - 4)){
+                        return 0;}else{
+                            return 1;}
 }
 
+int update_land(void)
+{
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			if (player_y < GAME_Y -1) 
+			{
+				if (player_y > GAME_Y - 5) {
+					playerpos[player_y][player_x] = false;
+					tb_put_cell(player_x, player_y, &empty);
+					player_y++;
+					playerpos[player_y][player_x] = true;
+					tb_put_cell(player_x, player_y, &player);
+                                        
+				}
+			}
+			if (player_y == (GAME_Y - 1)){
+                        return 1;} else{
+                            return 0;}
+}
 
 
 static int handle_key(uint16_t key)
@@ -182,6 +190,7 @@ int main(void)
 	//   Player
 	tb_put_cell(player_x, player_y, &player);
 	playerpos[player_y][player_x] = true;
+    int steigen = 1;
 
 
 	// Show output
@@ -224,11 +233,17 @@ int main(void)
 
 		if (counter2 > 0.001) { 
 			update_obst();
-			update_jump();
+			if (steigen){
+                steigen = update_jump();
+                
+            }
+            else{steigen = update_land();
+                
+            }
 
 			counter2 = 0;
 		}
-
+		
 
 
 
