@@ -11,19 +11,16 @@
 #define GAME_Y 39
 #define LOG_FILENAME "/tmp/spacei.log"
 #define MONSTER_Y 4
-#define PLAYER_Y GAME_Y - 1
 
 static unsigned int player_x = GAME_X/2;
-static bool obst[GAME_Y][GAME_X];
+static unsigned int player_y = GAME_Y - 1;
 
-//Für Player braucht man auch ein Array, das die Position speichert
-//static bool player[Game_Y][GAME_X];
+static bool obst[GAME_Y][GAME_X]; 
 
-static const struct tb_cell empty = {
-	.ch = ' ',
-	.fg = TB_DEFAULT,
-	.bg = TB_DEFAULT,
-};
+static bool playerpos[GAME_Y][GAME_X]; 
+
+static const struct tb_cell empty = { .ch = ' ', .fg = TB_DEFAULT, .bg = TB_DEFAULT, };
+
 static const struct tb_cell obs = {
 	.ch = '*',
 	.fg = TB_DEFAULT,
@@ -57,26 +54,75 @@ static void update_obst(void)
 		}
 	}
 }
+static void update_jump(void)
+{
+
+			if (player_y < GAME_Y -1) 
+			{
+				if (player_y > GAME_Y - 5) {
+					playerpos[player_y][player_x] = false;
+					tb_put_cell(player_x, player_y, &empty);
+					player_y--;
+					playerpos[player_y][player_x] = true;
+					tb_put_cell(player_x, player_y, &player);
+				}
+			}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 static int handle_key(uint16_t key)
 {
 	switch (key) {
 	case TB_KEY_ARROW_LEFT:			//Die neuen Positionen müssen auch jeweils im playerarray gespeichert werden
 		if (player_x > 0) {
-			tb_put_cell(player_x, PLAYER_Y, &empty);
+			tb_put_cell(player_x, player_y, &empty);
+
+			playerpos[player_y][player_x]= false;
 			player_x--;
-			tb_put_cell(player_x, PLAYER_Y, &player);
+			playerpos[player_y][player_x]= true;
+
+			tb_put_cell(player_x, player_y, &player);
 		}
 		break;
 	case TB_KEY_ARROW_RIGHT:
 		if (player_x < sizeof(obst[0])) {
-			tb_put_cell(player_x, PLAYER_Y, &empty);
+			tb_put_cell(player_x, player_y, &empty);
+
+			playerpos[player_y][player_x]= false;
 			player_x++;
-			tb_put_cell(player_x, PLAYER_Y, &player);
+			playerpos[player_y][player_x]= true;
+
+			tb_put_cell(player_x, player_y, &player);
 		}
 		break;
 	case TB_KEY_SPACE:
-	        ;// Hier muss das Sprungevent definiert werden
+		for (int i = 0; i <= GAME_X; i++)
+		{
+			if (playerpos[GAME_Y-1][i])
+			{
+				playerpos[player_y][player_x] = false;
+				tb_put_cell(player_x, player_y, &empty);
+				player_y--;
+				playerpos[player_y][player_x] = true;
+				tb_put_cell(player_x, player_y, &player);
+			}
+		}
 		break;
 	case TB_KEY_ESC:
 		return 1;
@@ -133,13 +179,10 @@ int main(void)
 	}
 
 	// Initialize board
-	//   Monster layout:
-	//   (4+5) | X | 5 | X | 5 | ... | (5+4)    = 79 = GAME_X
-	for (int i = 1; i <= 11; i++) {
-		tb_put_cell(4+ i*5 +1, MONSTER_Y, &monster);
-	}
 	//   Player
-	tb_put_cell(player_x, PLAYER_Y, &player);
+	tb_put_cell(player_x, player_y, &player);
+	playerpos[player_y][player_x] = true;
+
 
 	// Show output
 	tb_present();
@@ -147,16 +190,14 @@ int main(void)
 
 	// Game loop
 	struct tb_event e;
-	time_t timeanf;
-	double timediff, counter1 = 0, counter2 = 0;
+	clock_t timeanf;
+	double timediff, random, counter1 = 0, counter2 = 0;
 
-	srand(time(NULL));
 
-	while (true) {
-		// give user 100ms for input
-		timeanf = time(NULL);
+	while (true) { // give user 100ms for input
+		timeanf = clock();
 		
-		tb_peek_event(&e, 100);
+		tb_peek_event(&e, 10);
 		switch (e.type) {
 		case TB_EVENT_KEY:
 			if (handle_key(e.key) == 1) goto shutdown_tb;
@@ -166,26 +207,44 @@ int main(void)
 		}
 		
 		
+		srand(time(NULL));
+		random = (double)((rand() % 2)+ 1)/100;
 
-		timediff = (double)(time(NULL) - timeanf);
+		timediff = (double)(clock() - timeanf)/CLOCKS_PER_SEC;
 
 		counter1 += timediff;
 		counter2 += timediff;
-		
 
-		if (counter1 > rand() % 2 + 1) { //alle ein ODER zwei sek. erscheint ein neues hindernis?
-			obst[38][72] = true; 	//gen_obst: hindernis erscheint am rechten rand
+
+		if (counter1 > random)
+		{                                                    // (((rand() % 2)+ 1)/100)
+			obst[GAME_Y - 1][GAME_X-8] = true; 	//gen_obst: hindernis erscheint am rechten rand
 			counter1 = 0;
 		}
 
-	//	if (counter2 > 0.001) { leider misst timediff für kleine zeiten anscheinend nicht präzise genug, update ist viel zu langsam, vielleicht doch mit clock irgendwie?
+		if (counter2 > 0.001) { 
 			update_obst();
-	//		counter2 = 0;
-	//	}
+			update_jump();
+
+			counter2 = 0;
+		}
 
 
-		//update_jump(); hier muss die flugkurve des sprungs im playerarray gespeichert werden
-		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		//checken, ob kollision: sehr naiv, weil testet einfach jede runde sämtliche wahrheitswerte gegeneinander hier ist ein besserer algorithmus gefragt
 		//for (i = 0; i < GAME_Y; i++)
 		//	for (j=0; j< GAME_X; j++)
