@@ -139,7 +139,7 @@ static int handle_key(uint16_t key)
 		}
 		break;
 	case TB_KEY_SPACE:
-		for (int i = 0; i <= GAME_X; i++)
+		for (int i = 0; i < GAME_X; i++)
 		{
 			if (playerpos[GAME_Y-1][i])
 			{
@@ -279,8 +279,8 @@ start:
 		tb_present();
 
 
-		for (int y = 0; y <= GAME_Y; y++)
-			for (int x = 0; x<= GAME_X; x++)
+		for (int y = 0; y < GAME_Y; y++) {
+			for (int x = 0; x < GAME_X; x++) {
 				if (playerpos[y][x] && obst[y][x]) {
                     			tb_print (30, 28, "GAME OVER!");
 					tb_present();
@@ -288,21 +288,24 @@ start:
 					tb_print (25, 32, "Press ENTER to continue or ESC to leave"); 
 					tb_present();
 
-					tb_poll_event (&leave);
+					int answer;
+					do {
+						tb_poll_event(&leave);
+						if (leave.type == TB_EVENT_KEY) {
+							answer = handle_key(leave.key);
+							if (answer == 2) 
+							{		
+								goto start;
+							}			
+							if (answer == 1)  {
+								goto shutdown_tb;
+							}
+						}
+					} while (true);
 
-					if (leave.key == TB_EVENT_KEY) {
-					int answer = handle_key(leave.key);
-
-					if (answer == 2) 
-					{		
-						goto start;
-					}			
-					else if (answer == 1)
-						goto shutdown_tb;
-					}
-
-					
 				}
+			}
+		}
 
 	}
 
@@ -310,7 +313,9 @@ shutdown_tb:
 	fprintf(log, "exiting...\n");
 	tb_shutdown();
 close_log:
-	fclose(log);
+	if (fclose(log) != 0) {
+		perror("fclose");
+	}
 exit:
 	exit(status);
 }
