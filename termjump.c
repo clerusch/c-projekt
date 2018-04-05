@@ -12,6 +12,8 @@
 #define GAME_X 79
 #define GAME_Y 39
 #define LOG_FILENAME "/tmp/spacei.log"
+#define MONSTER_Y 4
+
 
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
@@ -20,7 +22,11 @@ static bool obst[GAME_Y][GAME_X];
 
 static bool playerpos[GAME_Y][GAME_X]; 
 
-static const struct tb_cell empty = { .ch = ' ', .fg = TB_DEFAULT, .bg = TB_DEFAULT, };
+static const struct tb_cell empty = { 
+	.ch = ' ', 
+	.fg = TB_DEFAULT, 
+	.bg = TB_DEFAULT, 
+};
 
 static const struct tb_cell obs = {
 	.ch = '*',
@@ -32,17 +38,11 @@ static const struct tb_cell player = {
 	.fg = TB_DEFAULT,
 	.bg = TB_GREEN,
 };
-/*
-static void tb_player ()
-{
-    static struct tb_cell playerarray[3][4]
-    for[
-        */
 
 static void tb_print (int posx, int posy, char *text)
 {
 
-	static struct tb_cell cellarray[50];
+	static struct tb_cell cellarray[GAME_X];
 
 	for (int i = 0; text[i] != '\0'; i++)
 	{
@@ -139,7 +139,7 @@ static int handle_key(uint16_t key)
 		}
 		break;
 	case TB_KEY_SPACE:
-		for (int i = 0; i <= GAME_X; i++)
+		for (int i = 0; i < GAME_X; i++)
 		{
 			if (playerpos[GAME_Y-1][i])
 			{
@@ -212,8 +212,18 @@ start:
 
 	// Initialize board
 	//   Player
+	
 	tb_clear();
+	player_y = GAME_Y - 1;
+	player_x = GAME_X / 2;
 	tb_put_cell(player_x, player_y, &player);
+
+	for (int x = 0; x < GAME_X; x++)
+		for (int y = 0; y < GAME_Y; y++) {
+			playerpos[y][x] = false;
+			obst[y][x] = false;
+		}
+
 	playerpos[player_y][player_x] = true;
         int steigen = 1;
 
@@ -252,7 +262,7 @@ start:
 
 		if (counter1 > random)
 		{                                                    // (((rand() % 2)+ 1)/100)
-			obst[GAME_Y - 1][GAME_X-8] = true; 	//hindernis erscheint am rechten rand
+			obst[GAME_Y - 1][GAME_X-1] = true; 	//hindernis erscheint am rechten rand
 			counter1 = 0;
 		}
 
@@ -269,8 +279,8 @@ start:
 		tb_present();
 
 
-		for (int y = 0; y <= GAME_Y; y++)
-			for (int x = 0; x<= GAME_X; x++)
+		for (int y = 0; y < GAME_Y; y++) {
+			for (int x = 0; x < GAME_X; x++) {
 				if (playerpos[y][x] && obst[y][x]) {
                     			tb_print (30, 28, "GAME OVER!");
 					tb_present();
@@ -278,21 +288,24 @@ start:
 					tb_print (25, 32, "Press ENTER to continue or ESC to leave"); 
 					tb_present();
 
-					tb_poll_event (&leave);
+					int answer;
+					do {
+						tb_poll_event(&leave);
+						if (leave.type == TB_EVENT_KEY) {
+							answer = handle_key(leave.key);
+							if (answer == 2) 
+							{		
+								goto start;
+							}			
+							if (answer == 1)  {
+								goto shutdown_tb;
+							}
+						}
+					} while (true);
 
-
-					int answer = handle_key(leave.key);
-
-					if (answer == 2) 
-					{	//restart?	
-						tb_clear();
-						tb_present(); 
-					}			
-					else if (answer == 1)
-						goto shutdown_tb;
-
-					
 				}
+			}
+		}
 
 	}
 
@@ -300,7 +313,9 @@ shutdown_tb:
 	fprintf(log, "exiting...\n");
 	tb_shutdown();
 close_log:
-	fclose(log);
+	if (fclose(log) != 0) {
+		perror("fclose");
+	}
 exit:
 	exit(status);
 }
