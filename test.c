@@ -1,8 +1,7 @@
-#include <stdio.h>
-
-int main (void)
+int main(void)
 {
-	printf ("Was geht hier ab?\n");
+	printf ("Was geht denn hier ab?!!?!?\n");
 	return 0;
 
 }
+hallo
