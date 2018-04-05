@@ -119,11 +119,11 @@ static int handle_key(uint16_t key)
 	case TB_KEY_ARROW_LEFT:			//Die neuen Positionen müssen auch jeweils im playerarray gespeichert werden
 		for (int y = 0; y < GAME_Y; y++)
 		{
-			if (playerpos[y][0] = true)
+			if (playerpos[y][0] == true)
 				;
 			else
 			{
-			for (int x = 0; i < GAME_X; i++)
+			for (int x = 0; x < GAME_X; x++)
 				for (int y = 0; y < GAME_Y; y++)
 					if (playerpos[y][x])
 					{
@@ -138,11 +138,11 @@ static int handle_key(uint16_t key)
 	case TB_KEY_ARROW_RIGHT:
 		for (int y = 0; y < GAME_Y; y++)
 		{
-			if (playerpos[y][GAME_X-1] = true)
+			if (playerpos[y][GAME_X-1] == true)
 				;
 			else
 			{
-				for (int x = 0; i < GAME_X; i++)
+				for (int x = 0; x < GAME_X; x++)
 					for (int y = 0; y < GAME_Y; y++)
 						if (playerpos[y][x])
 						{
@@ -234,18 +234,33 @@ start:
 
 	// Initialize board
 	//   Player
-	
-	tb_clear();
-	
-	tb_put_cell(player_x, player_y, &player);
-
 	for (int x = 0; x < GAME_X; x++)
 		for (int y = 0; y < GAME_Y; y++) {
 			playerpos[y][x] = false;
 			obst[y][x] = false;
 		}
 
+
+	tb_clear();
+
 	playerpos[player_y][player_x] = true;
+	playerpos[player_y][player_x+2] = true;
+        playerpos[player_y-1][player_x+1] = true;
+        playerpos[player_y-2][player_x+1]=true;
+        playerpos[player_y-3][player_x+1]=true;
+        playerpos[player_y-2][player_x+2]=true;
+        playerpos[player_y-2][player_x]=true;
+
+       tb_put_cell(player_x, player_y, &player);
+       tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
+    
+            
+
         int steigen = 1;
 
 
