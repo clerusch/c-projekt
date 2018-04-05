@@ -69,8 +69,8 @@ static void tb_print (int posx, int posy, char *text)
 	for (int i = 0; text[i] != '\0'; i++)
 	{
 		cellarray[i].ch = text[i];	
-		cellarray[i].fg = TB_DEFAULT;
-		cellarray[i].bg = TB_YELLOW;
+		cellarray[i].fg = TB_WHITE;
+		cellarray[i].bg = TB_BLACK;
 
 		tb_put_cell(posx + i, posy, &cellarray[i]);
 
