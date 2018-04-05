@@ -22,7 +22,11 @@ static bool obst[GAME_Y][GAME_X];
 
 static bool playerpos[GAME_Y][GAME_X]; 
 
-static const struct tb_cell empty = { .ch = ' ', .fg = TB_DEFAULT, .bg = TB_DEFAULT, };
+static const struct tb_cell empty = { 
+	.ch = ' ', 
+	.fg = TB_DEFAULT, 
+	.bg = TB_DEFAULT, 
+};
 
 static const struct tb_cell obs = {
 	.ch = '*',
@@ -38,7 +42,7 @@ static const struct tb_cell player = {
 static void tb_print (int posx, int posy, char *text)
 {
 
-	static struct tb_cell cellarray[50];
+	static struct tb_cell cellarray[GAME_X];
 
 	for (int i = 0; text[i] != '\0'; i++)
 	{
@@ -208,8 +212,18 @@ start:
 
 	// Initialize board
 	//   Player
+	
 	tb_clear();
+	player_y = GAME_Y - 1;
+	player_x = GAME_X / 2;
 	tb_put_cell(player_x, player_y, &player);
+
+	for (int x = 0; x < GAME_X; x++)
+		for (int y = 0; y < GAME_Y; y++) {
+			playerpos[y][x] = false;
+			obst[y][x] = false;
+		}
+
 	playerpos[player_y][player_x] = true;
         int steigen = 1;
 
@@ -248,7 +262,7 @@ start:
 
 		if (counter1 > random)
 		{                                                    // (((rand() % 2)+ 1)/100)
-			obst[GAME_Y - 1][GAME_X-8] = true; 	//hindernis erscheint am rechten rand
+			obst[GAME_Y - 1][GAME_X-1] = true; 	//hindernis erscheint am rechten rand
 			counter1 = 0;
 		}
 
@@ -276,16 +290,16 @@ start:
 
 					tb_poll_event (&leave);
 
-
+					if (leave.key == TB_EVENT_KEY) {
 					int answer = handle_key(leave.key);
 
 					if (answer == 2) 
-					{	//restart?	
-						tb_clear();
-						tb_present(); 
+					{		
+						goto start;
 					}			
 					else if (answer == 1)
 						goto shutdown_tb;
+					}
 
 					
 				}
