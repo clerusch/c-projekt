@@ -14,7 +14,7 @@
 #define LOG_FILENAME "/tmp/spacei.log"
 #define MONSTER_Y 4
 
-int x = 0, y = 0;
+int x = 0, y = 0, z = 0, steigen = 1, neu=0, answer;
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
 
@@ -62,7 +62,7 @@ static void update_obst(void)
 		obst[38][0] = false;
 	}
 	for (size_t y = 1; y < sizeof(obst)/sizeof(obst[0]); y++) {
-		for (size_t x = 0; x < sizeof(obst[0]); x++) {
+		for (size_t x = 1; x < sizeof(obst[0]); x++) {
 			if (obst[y][x]) {
 				obst[y][x] = false;
 				tb_put_cell(x, y, &empty);
@@ -75,42 +75,93 @@ static void update_obst(void)
 int update_jump(void)
 {
 
-			if (player_y < GAME_Y -1) 
+			if (z >= 1 && z < 6) 
 			{
-				if (player_y > GAME_Y - 5) {
-					playerpos[player_y][player_x] = false;
-					tb_put_cell(player_x, player_y, &empty);
-					player_y--;
-					playerpos[player_y][player_x] = true;
-					tb_put_cell(player_x, player_y, &player);
-				if (player_y == GAME_Y - 4) return 0;
-				else return 1;
-                   
+				for (x = 0; x < GAME_X - 1; x++) {
+					for (y = 1; y < GAME_Y; y++) {
+						if (playerpos[y][x])
+						{
+							playerpos[y][x] = false;
+							playerpos[y-1][x] = true;	
+							tb_put_cell(x, y, &empty);
+							tb_put_cell(x, y-1, &player);
+						}
+					}
 				}
-			} 
-			if (player_y == (GAME_Y - 4)){
-                        return 0;}else{
-                            return 1;}
+				z++;
+			}
+			 
+			if (z == 6)
+			{
+			z++;
+		       	return 0;
+			}
+
+			else return 1;
 }
 
 int update_land(void)
 {
 
-			if (player_y < GAME_Y -1) 
+			if (z < 12) 
 			{
-				if (player_y > GAME_Y - 5) {
-					playerpos[player_y][player_x] = false;
-					tb_put_cell(player_x, player_y, &empty);
-					player_y++;
-					playerpos[player_y][player_x] = true;
-					tb_put_cell(player_x, player_y, &player);
-                                        
-				}
+					for (x = GAME_X-1; x > 0; x--) {
+						for (y = GAME_Y-2; y >= 0; y--) {
+							if (playerpos[y][x])
+							{
+								playerpos[y][x] = false;
+								playerpos[y+1][x] = true;	
+								tb_put_cell(x, y, &empty);
+								tb_put_cell(x, y+1, &player);
+							}
+						}
+					}
+					z++;
+				
 			}
-			if (player_y == (GAME_Y - 1)){
-                        return 1;} else{
+			if (z == 12)
+			{
+			z = 0;	
+                        return 1;
+			}
+		       	else {
                             return 0;}
 }
+
+static void re_init (void)
+{
+	// Initialize board
+	//   Player
+	for (x = 0; x < GAME_X; x++)
+		for (y = 0; y < GAME_Y; y++) {
+			playerpos[y][x] = false;
+			obst[y][x] = false;
+		}
+
+	steigen = 1, neu = 0, z = 0;
+	tb_clear();
+
+	playerpos[player_y][player_x] = true;
+	playerpos[player_y][player_x+2] = true;
+        playerpos[player_y-1][player_x+1] = true;
+        playerpos[player_y-2][player_x+1]=true;
+        playerpos[player_y-3][player_x+1]=true;
+        playerpos[player_y-2][player_x+2]=true;
+        playerpos[player_y-2][player_x]=true;
+
+       tb_put_cell(player_x, player_y, &player);
+       tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
+
+	// Show output
+	tb_present();
+}
+
+
 
 
 static int handle_key(uint16_t key)
@@ -123,7 +174,7 @@ static int handle_key(uint16_t key)
 				;
 			else
 			{
-			for (x = 0; x < GAME_X - 1; x++)
+			for (x = 1; x < GAME_X - 1; x++)
 				for (y = 0; y < GAME_Y; y++)
 					if (playerpos[y][x])
 					{
@@ -142,7 +193,7 @@ static int handle_key(uint16_t key)
 				;
 			else
 			{
-				for (x = GAME_X - 1; x > 0; x--)
+				for (x = GAME_X - 2; x > 0; x--)
 					for (y = 0; y < GAME_Y; y++)
 						if (playerpos[y][x])
 						{
@@ -156,9 +207,13 @@ static int handle_key(uint16_t key)
 
 		break;
 	case TB_KEY_SPACE:
+
+		if (z == 0)
+		       	z = 1;
+		/*
 		for (int i = 0; i < GAME_X; i++)
 		{
-			if (playerpos[GAME_Y-1][i])
+			if (playerpos[GAME_Y-3][i])
 			{
 				playerpos[player_y][player_x] = false;
 				tb_put_cell(player_x, player_y, &empty);
@@ -167,6 +222,7 @@ static int handle_key(uint16_t key)
 				tb_put_cell(player_x, player_y, &player);
 			}
 		}
+		*/
 		break;
 	case TB_KEY_ESC:
 		return 1;
@@ -230,43 +286,7 @@ int main(void)
 	clock_t timeanf;
 	double timediff, random, counter1 = 0, counter2 = 0;
 
-start:
-
-	// Initialize board
-	//   Player
-	for (int x = 0; x < GAME_X; x++)
-		for (int y = 0; y < GAME_Y; y++) {
-			playerpos[y][x] = false;
-			obst[y][x] = false;
-		}
-
-
-	tb_clear();
-
-	playerpos[player_y][player_x] = true;
-	playerpos[player_y][player_x+2] = true;
-        playerpos[player_y-1][player_x+1] = true;
-        playerpos[player_y-2][player_x+1]=true;
-        playerpos[player_y-3][player_x+1]=true;
-        playerpos[player_y-2][player_x+2]=true;
-        playerpos[player_y-2][player_x]=true;
-
-       tb_put_cell(player_x, player_y, &player);
-       tb_put_cell(player_x+2, player_y, &player);
-       tb_put_cell(player_x+1, player_y-1, &player);
-       tb_put_cell(player_x+1, player_y-2, &player);
-       tb_put_cell(player_x+1, player_y-3, &player);
-       tb_put_cell(player_x+2, player_y-2, &player);
-       tb_put_cell(player_x, player_y-2, &player);
-    
-            
-
-        int steigen = 1;
-
-
-	// Show output
-	tb_present();
-
+	re_init();
 
 	// Game loop
 
@@ -315,8 +335,8 @@ start:
 		tb_present();
 
 
-		for (int y = 0; y < GAME_Y; y++) {
-			for (int x = 0; x < GAME_X; x++) {
+		for (y = 0; y < GAME_Y; y++) {
+			for (x = 0; x < GAME_X; x++) {
 				if (playerpos[y][x] && obst[y][x]) {
                     			tb_print (30, 28, "GAME OVER!");
 					tb_present();
@@ -324,20 +344,21 @@ start:
 					tb_print (25, 32, "Press ENTER to continue or ESC to leave"); 
 					tb_present();
 
-					int answer;
 					do {
 						tb_poll_event(&leave);
 						if (leave.type == TB_EVENT_KEY) {
 							answer = handle_key(leave.key);
 							if (answer == 2) 
 							{		
-								goto start;
+								re_init();
+								neu = 1;
+
 							}			
 							if (answer == 1)  {
 								goto shutdown_tb;
 							}
 						}
-					} while (true);
+					} while (neu == 0);
 
 				}
 			}
