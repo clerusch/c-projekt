@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <time.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include <termbox.h>
 
@@ -12,6 +13,7 @@
 #define GAME_Y 39
 #define LOG_FILENAME "/tmp/spacei.log"
 #define MONSTER_Y 4
+
 
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
@@ -32,11 +34,22 @@ static const struct tb_cell player = {
 	.fg = TB_DEFAULT,
 	.bg = TB_GREEN,
 };
-static struct tb_cell monster = {
-	.ch = 'X',
-	.fg = TB_BOLD,
-	.bg = TB_RED,
-};
+
+static void tb_print (int posx, int posy, char *text)
+{
+
+	static struct tb_cell cellarray[50];
+
+	for (int i = 0; text[i] != '\0'; i++)
+	{
+		cellarray[i].ch = text[i];	
+		cellarray[i].fg = TB_DEFAULT;
+		cellarray[i].bg = TB_YELLOW;
+
+		tb_put_cell(posx + i, posy, &cellarray[i]);
+
+	}
+}
 
 static void update_obst(void)
 {
@@ -136,6 +149,10 @@ static int handle_key(uint16_t key)
 		break;
 	case TB_KEY_ESC:
 		return 1;
+
+	case TB_KEY_ENTER:
+		return 2;
+
 	default:
 		break;
 	}
@@ -187,9 +204,11 @@ int main(void)
 			goto shutdown_tb;
 		}
 	}
+start:
 
 	// Initialize board
 	//   Player
+	tb_clear();
 	tb_put_cell(player_x, player_y, &player);
 	playerpos[player_y][player_x] = true;
         int steigen = 1;
@@ -200,18 +219,18 @@ int main(void)
 
 
 	// Game loop
-	struct tb_event e;
+	struct tb_event input, leave;
 	clock_t timeanf;
 	double timediff, random, counter1 = 0, counter2 = 0;
 
 
-	while (true) { // give user 100ms for input
+	while (true) { // give user 10ms for input
 		timeanf = clock();
 		
-		tb_peek_event(&e, 10);
-		switch (e.type) {
+		tb_peek_event(&input, 10);
+		switch (input.type) {
 		case TB_EVENT_KEY:
-			if (handle_key(e.key) == 1) goto shutdown_tb;
+			if (handle_key(input.key) == 1) goto shutdown_tb;
 			break;
 		default:
 			;
@@ -229,51 +248,46 @@ int main(void)
 
 		if (counter1 > random)
 		{                                                    // (((rand() % 2)+ 1)/100)
-			obst[GAME_Y - 1][GAME_X-8] = true; 	//gen_obst: hindernis erscheint am rechten rand
+			obst[GAME_Y - 1][GAME_X-8] = true; 	//hindernis erscheint am rechten rand
 			counter1 = 0;
 		}
 
 		if (counter2 > 0.001) { 
 			update_obst();
-
-
-			if (steigen){
-                steigen = update_jump();
-                
-            }
-            else{steigen = update_land();
-                
-            }
+			if (steigen)
+                		steigen = update_jump();
+            		else
+				steigen = update_land();
 
 			counter2 = 0;
 		}
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		tb_present();
+
 
 		for (int y = 0; y <= GAME_Y; y++)
 			for (int x = 0; x<= GAME_X; x++)
 				if (playerpos[y][x] && obst[y][x]) {
-		//			tb_print ("GAME OVER!");
+                    			tb_print (30, 28, "GAME OVER!");
+					tb_present();
 					sleep(3);
-					goto shutdown_tb;
+					tb_print (25, 32, "Press ENTER to continue or ESC to leave"); 
+					tb_present();
+
+					tb_poll_event (&leave);
+
+
+					int answer = handle_key(leave.key);
+
+					if (answer == 2) 
+					{	//restart?	
+						tb_clear();
+						tb_present(); 
+					}			
+					else if (answer == 1)
+						goto shutdown_tb;
+
+					
 				}
 
 	}
