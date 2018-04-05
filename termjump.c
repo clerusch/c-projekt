@@ -35,8 +35,7 @@ int my_itoa (int in, char **out_str)
 
     return 0;                                                                        
 }                   
-time_t t1 = time(NULL);
-(int)t1;
+    
 int x = 0, y = 0;
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
@@ -291,6 +290,8 @@ start:
 	tb_present();
 
 
+    time_t t1 = time(NULL);
+    (int)t1;
 	// Game loop
 
 
@@ -298,13 +299,15 @@ start:
 		timeanf = clock();
 		
         // Uhrzeit block
-        char * timer(int t1, int t2){
+        time_t t2 = time(NULL);
+        (int)t2;
+        char ** timer(int t1, int t2){
             int tdiff = t2-t1;
-            char *cake = "";
-            itoa(tdiff, cake);
+            char **cake = "";
+            my_itoa(tdiff, cake);
             return cake;
         }
-        char * zeitausgabe = timer(t1,t2);
+        char ** zeitausgabe = timer(t1,t2);
         tb_print(10,10,zeitausgabe);
         // Uhrzeit block ende
 
