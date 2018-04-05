@@ -117,26 +117,43 @@ static int handle_key(uint16_t key)
 {
 	switch (key) {
 	case TB_KEY_ARROW_LEFT:			//Die neuen Positionen müssen auch jeweils im playerarray gespeichert werden
-		if (player_x > 0) {
-			tb_put_cell(player_x, player_y, &empty);
-
-			playerpos[player_y][player_x]= false;
-			player_x--;
-			playerpos[player_y][player_x]= true;
-
-			tb_put_cell(player_x, player_y, &player);
+		for (int y = 0; y < GAME_Y; y++)
+		{
+			if (playerpos[y][0] = true)
+				;
+			else
+			{
+			for (int x = 0; i < GAME_X; i++)
+				for (int y = 0; y < GAME_Y; y++)
+					if (playerpos[y][x])
+					{
+						playerpos[y][x] = false;
+						playerpos[y][x-1] = true;	
+						tb_put_cell(x, y, &empty);
+						tb_put_cell(x-1, y, &player);
+					}
+			}
 		}
 		break;
 	case TB_KEY_ARROW_RIGHT:
-		if (player_x < sizeof(obst[0])) {
-			tb_put_cell(player_x, player_y, &empty);
-
-			playerpos[player_y][player_x]= false;
-			player_x++;
-			playerpos[player_y][player_x]= true;
-
-			tb_put_cell(player_x, player_y, &player);
+		for (int y = 0; y < GAME_Y; y++)
+		{
+			if (playerpos[y][GAME_X-1] = true)
+				;
+			else
+			{
+				for (int x = 0; i < GAME_X; i++)
+					for (int y = 0; y < GAME_Y; y++)
+						if (playerpos[y][x])
+						{
+							playerpos[y][x] = false;
+							playerpos[y][x+1] = true;	
+							tb_put_cell(x, y, &empty);
+							tb_put_cell(x+1, y, &player);
+						}
+			}
 		}
+
 		break;
 	case TB_KEY_SPACE:
 		for (int i = 0; i < GAME_X; i++)
@@ -208,14 +225,18 @@ int main(void)
 			goto shutdown_tb;
 		}
 	}
+
+	struct tb_event input, leave;
+	clock_t timeanf;
+	double timediff, random, counter1 = 0, counter2 = 0;
+
 start:
 
 	// Initialize board
 	//   Player
 	
 	tb_clear();
-	player_y = GAME_Y - 1;
-	player_x = GAME_X / 2;
+	
 	tb_put_cell(player_x, player_y, &player);
 
 	for (int x = 0; x < GAME_X; x++)
@@ -233,9 +254,6 @@ start:
 
 
 	// Game loop
-	struct tb_event input, leave;
-	clock_t timeanf;
-	double timediff, random, counter1 = 0, counter2 = 0;
 
 
 	while (true) { // give user 10ms for input
@@ -262,6 +280,9 @@ start:
 
 		if (counter1 > random)
 		{                                                    // (((rand() % 2)+ 1)/100)
+
+
+			obst[GAME_Y - 2][GAME_X-1] = true; 		
 			obst[GAME_Y - 1][GAME_X-1] = true; 	//hindernis erscheint am rechten rand
 			counter1 = 0;
 		}
