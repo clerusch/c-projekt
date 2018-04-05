@@ -14,7 +14,7 @@
 #define LOG_FILENAME "/tmp/spacei.log"
 #define MONSTER_Y 4
 
-
+// Integer to ASCII Funktion
 int my_itoa (int in, char **out_str)                                                     
 {                                                                                        
     int i, count = in, countziffern = 0, rechteziffer;                                   
