@@ -35,7 +35,9 @@ int my_itoa (int in, char **out_str)
 
     return 0;                                                                        
 }                   
-int t1 = time(NULL);
+time_t t1 = time(NULL);
+(int)t1;
+int x = 0, y = 0;
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
 
@@ -137,15 +139,15 @@ int update_land(void)
 static int handle_key(uint16_t key)
 {
 	switch (key) {
-	case TB_KEY_ARROW_LEFT:			//Die neuen Positionen müssen auch jeweils im playerarray gespeichert werden
-		for (int y = 0; y < GAME_Y; y++)
+	case TB_KEY_ARROW_LEFT:		
+		for (y = 0; y < GAME_Y; y++)
 		{
 			if (playerpos[y][0] == true)
 				;
 			else
 			{
-			for (int x = 0; x < GAME_X; x++)
-				for (int y = 0; y < GAME_Y; y++)
+			for (x = 0; x < GAME_X - 1; x++)
+				for (y = 0; y < GAME_Y; y++)
 					if (playerpos[y][x])
 					{
 						playerpos[y][x] = false;
@@ -157,14 +159,14 @@ static int handle_key(uint16_t key)
 		}
 		break;
 	case TB_KEY_ARROW_RIGHT:
-		for (int y = 0; y < GAME_Y; y++)
+		for (y = 0; y < GAME_Y; y++)
 		{
 			if (playerpos[y][GAME_X-1] == true)
 				;
 			else
 			{
-				for (int x = 0; x < GAME_X; x++)
-					for (int y = 0; y < GAME_Y; y++)
+				for (x = GAME_X - 1; x > 0; x--)
+					for (y = 0; y < GAME_Y; y++)
 						if (playerpos[y][x])
 						{
 							playerpos[y][x] = false;
