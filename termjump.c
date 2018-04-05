@@ -301,8 +301,8 @@ start:
         // Uhrzeit block
         time_t t2 = time(NULL);
         (int)t2;
-        char ** timer(int t1, int t2){
-            int tdiff = t2-t1;
+        char ** timer(int zeit1, int zeit2){
+            int tdiff = zeit2-zeit1;
             char **cake = "";
             my_itoa(tdiff, cake);
             return cake;
