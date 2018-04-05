@@ -1,0 +1,5 @@
+git add namdercdatei.c
+git commit -m "message"
+git push
+
+git pull

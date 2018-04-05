@@ -12,6 +12,8 @@
 #define GAME_X 79
 #define GAME_Y 39
 #define LOG_FILENAME "/tmp/spacei.log"
+#define MONSTER_Y 4
+
 
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
@@ -32,12 +34,6 @@ static const struct tb_cell player = {
 	.fg = TB_DEFAULT,
 	.bg = TB_GREEN,
 };
-/*
-static void tb_player ()
-{
-    static struct tb_cell playerarray[3][4]
-    for[
-        */
 
 static void tb_print (int posx, int posy, char *text)
 {
@@ -80,9 +76,21 @@ int update_jump(void)
 				if (player_y > GAME_Y - 5) {
 					playerpos[player_y][player_x] = false;
 					tb_put_cell(player_x, player_y, &empty);
+                     tb_put_cell(player_x+2, player_y, &empty);
+       tb_put_cell(player_x+1, player_y-1, &empty);
+       tb_put_cell(player_x+1, player_y-2, &empty);
+       tb_put_cell(player_x+1, player_y-3, &empty);
+       tb_put_cell(player_x+2, player_y-2, &empty);
+       tb_put_cell(player_x, player_y-2, &empty);
 					player_y--;
 					playerpos[player_y][player_x] = true;
 					tb_put_cell(player_x, player_y, &player);
+                     tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
 				if (player_y == GAME_Y - 4) return 0;
 				else return 1;
                    
@@ -101,9 +109,21 @@ int update_land(void)
 				if (player_y > GAME_Y - 5) {
 					playerpos[player_y][player_x] = false;
 					tb_put_cell(player_x, player_y, &empty);
+                     tb_put_cell(player_x+2, player_y, &empty);
+       tb_put_cell(player_x+1, player_y-1, &empty);
+       tb_put_cell(player_x+1, player_y-2, &empty);
+       tb_put_cell(player_x+1, player_y-3, &empty);
+       tb_put_cell(player_x+2, player_y-2, &empty);
+       tb_put_cell(player_x, player_y-2, &empty);
 					player_y++;
 					playerpos[player_y][player_x] = true;
 					tb_put_cell(player_x, player_y, &player);
+                    tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
                                         
 				}
 			}
@@ -119,23 +139,47 @@ static int handle_key(uint16_t key)
 	case TB_KEY_ARROW_LEFT:			//Die neuen Positionen müssen auch jeweils im playerarray gespeichert werden
 		if (player_x > 0) {
 			tb_put_cell(player_x, player_y, &empty);
+            tb_put_cell(player_x+2, player_y, &empty);
+       tb_put_cell(player_x+1, player_y-1, &empty);
+       tb_put_cell(player_x+1, player_y-2, &empty);
+       tb_put_cell(player_x+1, player_y-3, &empty);
+       tb_put_cell(player_x+2, player_y-2, &empty);
+       tb_put_cell(player_x, player_y-2, &empty);
 
 			playerpos[player_y][player_x]= false;
 			player_x--;
 			playerpos[player_y][player_x]= true;
 
 			tb_put_cell(player_x, player_y, &player);
+            tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
 		}
 		break;
 	case TB_KEY_ARROW_RIGHT:
 		if (player_x < sizeof(obst[0])) {
 			tb_put_cell(player_x, player_y, &empty);
+              tb_put_cell(player_x+2, player_y, &empty);
+       tb_put_cell(player_x+1, player_y-1, &empty);
+       tb_put_cell(player_x+1, player_y-2, &empty);
+       tb_put_cell(player_x+1, player_y-3, &empty);
+       tb_put_cell(player_x+2, player_y-2, &empty);
+       tb_put_cell(player_x, player_y-2, &empty);
 
 			playerpos[player_y][player_x]= false;
 			player_x++;
 			playerpos[player_y][player_x]= true;
 
 			tb_put_cell(player_x, player_y, &player);
+             tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
 		}
 		break;
 	case TB_KEY_SPACE:
@@ -145,9 +189,21 @@ static int handle_key(uint16_t key)
 			{
 				playerpos[player_y][player_x] = false;
 				tb_put_cell(player_x, player_y, &empty);
+                       tb_put_cell(player_x+2, player_y, &empty);
+       tb_put_cell(player_x+1, player_y-1, &empty);
+       tb_put_cell(player_x+1, player_y-2, &empty);
+       tb_put_cell(player_x+1, player_y-3, &empty);
+       tb_put_cell(player_x+2, player_y-2, &empty);
+       tb_put_cell(player_x, player_y-2, &empty);
 				player_y--;
 				playerpos[player_y][player_x] = true;
 				tb_put_cell(player_x, player_y, &player);
+                 tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
 			}
 		}
 		break;
@@ -215,6 +271,23 @@ start:
 	tb_clear();
 	tb_put_cell(player_x, player_y, &player);
 	playerpos[player_y][player_x] = true;
+    if (playerpos[player_y][player_x]){
+       /* playerpos[player_y][player_x+2] = true;
+        playerpos[player_y-1][player_x+1] = true;
+        playerpos[player_y-2][player_x+1]=true;
+        playerpos[player_y-3][player_x+1]=true;
+        playerpos[player_y-2][player_x+2]=true;
+        playerpos[player_y-2][player_x]=true;
+        */
+       tb_put_cell(player_x+2, player_y, &player);
+       tb_put_cell(player_x+1, player_y-1, &player);
+       tb_put_cell(player_x+1, player_y-2, &player);
+       tb_put_cell(player_x+1, player_y-3, &player);
+       tb_put_cell(player_x+2, player_y-2, &player);
+       tb_put_cell(player_x, player_y-2, &player);
+    }
+            
+        
         int steigen = 1;
 
 

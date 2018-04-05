@@ -4,7 +4,6 @@
 #include <inttypes.h>
 #include <time.h>
 #include <unistd.h>
-#include <ctype.h>
 
 #include <termbox.h>
 
@@ -12,6 +11,7 @@
 #define GAME_X 79
 #define GAME_Y 39
 #define LOG_FILENAME "/tmp/spacei.log"
+#define MONSTER_Y 4
 
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
@@ -20,9 +20,14 @@ static bool obst[GAME_Y][GAME_X];
 
 static bool playerpos[GAME_Y][GAME_X]; 
 
-static const struct tb_cell empty = { .ch = ' ', .fg = TB_DEFAULT, .bg = TB_DEFAULT, };
+static const struct tb_cell empty = { 
+    .ch = ' ', 
+    .fg = TB_DEFAULT, 
+    .bg = TB_DEFAULT, 
+    
+};
 
-static const struct tb_cell obs = {
+static const struct tb_cell obst = {
 	.ch = '*',
 	.fg = TB_DEFAULT,
 	.bg = TB_YELLOW,
@@ -32,34 +37,54 @@ static const struct tb_cell player = {
 	.fg = TB_DEFAULT,
 	.bg = TB_GREEN,
 };
-/*
-static void tb_player ()
-{
-    static struct tb_cell playerarray[3][4]
-    for[
-        */
 
-static void tb_print (int posx, int posy, char *text)
-{
 
-	static struct tb_cell cellarray[50];
+//char gameover[9] = {'G', 'A', 'M', 'E', ' ', 'O', 'V', 'E', 'R'};
+static struct tb_cell g = {
+	.ch = 'G',
+	.fg = TB_RED,
+	.bg = TB_DEFAULT,
+};
+static struct tb_cell a = {
+	.ch = 'A',
+	.fg = TB_RED,
+	.bg = TB_DEFAULT,
+};
+static struct tb_cell m = {
+	.ch = 'M',
+	.fg = TB_RED,
+	.bg = TB_DEFAULT,
+};
+static struct tb_cell ee = {
+	.ch = 'E',
+	.fg = TB_RED,
+	.bg = TB_DEFAULT,
+};
+static struct tb_cell o = {
+	.ch = 'O',
+	.fg = TB_RED,
+	.bg = TB_DEFAULT,
+};
+static struct tb_cell v = {
+	.ch = 'V',
+	.fg = TB_RED,
+	.bg = TB_DEFAULT,
+};
 
-	for (int i = 0; text[i] != '\0'; i++)
-	{
-		cellarray[i].ch = text[i];	
-		cellarray[i].fg = TB_DEFAULT;
-		cellarray[i].bg = TB_YELLOW;
+static struct tb_cell r = {
+	.ch = 'R',
+	.fg = TB_RED,
+	.bg = TB_DEFAULT,
+};
 
-		tb_put_cell(posx + i, posy, &cellarray[i]);
 
-	}
-}
+
 
 static void update_obst(void)
 {
 	for (size_t y = 0; y < GAME_Y; y++) {
-		tb_put_cell(0, 38, &empty);
-		obst[38][0] = false;
+		tb_put_cell(0, GAME_Y-1, &empty);
+		obst[GAME_Y-1][0] = false;
 	}
 	for (size_t y = 1; y < sizeof(obst)/sizeof(obst[0]); y++) {
 		for (size_t x = 0; x < sizeof(obst[0]); x++) {
@@ -72,7 +97,9 @@ static void update_obst(void)
 		}
 	}
 }
+
 int update_jump(void)
+
 {
 
 			if (player_y < GAME_Y -1) 
@@ -83,9 +110,8 @@ int update_jump(void)
 					player_y--;
 					playerpos[player_y][player_x] = true;
 					tb_put_cell(player_x, player_y, &player);
-				if (player_y == GAME_Y - 4) return 0;
-				else return 1;
-                   
+
+				
 				}
 			} 
 			if (player_y == (GAME_Y - 4)){
@@ -153,10 +179,6 @@ static int handle_key(uint16_t key)
 		break;
 	case TB_KEY_ESC:
 		return 1;
-
-	case TB_KEY_ENTER:
-		return 2;
-
 	default:
 		break;
 	}
@@ -208,14 +230,12 @@ int main(void)
 			goto shutdown_tb;
 		}
 	}
-start:
 
 	// Initialize board
 	//   Player
-	tb_clear();
 	tb_put_cell(player_x, player_y, &player);
 	playerpos[player_y][player_x] = true;
-        int steigen = 1;
+    int steigen = 1;
 
 
 	// Show output
@@ -223,18 +243,20 @@ start:
 
 
 	// Game loop
-	struct tb_event input, leave;
+	struct tb_event e;
 	clock_t timeanf;
+
 	double timediff, random, counter1 = 0, counter2 = 0;
 
 
-	while (true) { // give user 10ms for input
+	while (true) { // give user 100ms for input
 		timeanf = clock();
 		
-		tb_peek_event(&input, 10);
-		switch (input.type) {
+        //give user 10ms for input
+		tb_peek_event(&e, 10);
+		switch (e.type) {
 		case TB_EVENT_KEY:
-			if (handle_key(input.key) == 1) goto shutdown_tb;
+			if (handle_key(e.key) == 1) goto shutdown_tb;
 			break;
 		default:
 			;
@@ -252,46 +274,59 @@ start:
 
 		if (counter1 > random)
 		{                                                    // (((rand() % 2)+ 1)/100)
-			obst[GAME_Y - 1][GAME_X-8] = true; 	//hindernis erscheint am rechten rand
+			obst[GAME_Y - 1][GAME_X-8] = true; 	//gen_obst: hindernis erscheint am rechten rand
 			counter1 = 0;
 		}
 
 		if (counter2 > 0.001) { 
 			update_obst();
-			if (steigen)
-                		steigen = update_jump();
-            		else
-				steigen = update_land();
+			if (steigen){
+                steigen = update_jump();
+                
+            }
+            else{steigen = update_land();
+                
+            }
 
 			counter2 = 0;
 		}
+		
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
 
 		tb_present();
-
 
 		for (int y = 0; y <= GAME_Y; y++)
 			for (int x = 0; x<= GAME_X; x++)
 				if (playerpos[y][x] && obst[y][x]) {
-                    			tb_print (30, 28, "GAME OVER!");
-					tb_present();
+                    //tb_print ("GAME OVER!")
+                    tb_put_cell(GAME_X-17, GAME_Y-25, &g);
+                    tb_put_cell(GAME_X-15, GAME_Y-25, &a);  
+                    tb_put_cell(GAME_X-13, GAME_Y-25, &m);
+                    tb_put_cell(GAME_X-11, GAME_Y-25, &ee);
+                    tb_put_cell(GAME_X-7, GAME_Y-25, &o);
+                    tb_put_cell(GAME_X-5, GAME_Y-25, &v);  
+                    tb_put_cell(GAME_X-3, GAME_Y-25, &ee);
+                    tb_put_cell(GAME_X-1, GAME_Y-25, &r);
+                    tb_present();
 					sleep(3);
-					tb_print (25, 32, "Press ENTER to continue or ESC to leave"); 
-					tb_present();
-
-					tb_poll_event (&leave);
-
-
-					int answer = handle_key(leave.key);
-
-					if (answer == 2) 
-					{	//restart?	
-						tb_clear();
-						tb_present(); 
-					}			
-					else if (answer == 1)
-						goto shutdown_tb;
-
-					
+					goto shutdown_tb;
 				}
 
 	}
