@@ -301,13 +301,6 @@ start:
         char kuchen[20];
         time_t t2 = time(NULL);
         sprintf(kuchen,"Spielzeit %li:%li", (t2-t1)/60,(t2-t1)%60 );
-        //char ** timer(int zeit1, int zeit2){
-        //    int tdiff = zeit2-zeit1;
-        //    char **cake = "";
-        //    my_itoa(tdiff, cake);
-        //    return cake;
-        //}
-        //char ** zeitausgabe = timer(t1,t2);
         tb_print(10,10,kuchen);
         // Uhrzeit block ende
 
