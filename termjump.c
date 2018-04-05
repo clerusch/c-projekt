@@ -15,6 +15,27 @@
 #define MONSTER_Y 4
 
 
+int my_itoa (int in, char **out_str)                                                     
+{                                                                                        
+    int i, count = in, countziffern = 0, rechteziffer;                                   
+
+    while (count > 0) {                                                                  
+        count /= 10;                                                                     
+        countziffern++;                                                                  
+    }                                                                                
+
+    *out_str[countziffern] = '\0';                                                   
+
+    for (i = countziffern - 1; i >= 0; i--)                                          
+    {                                                                                
+        rechteziffer = in % 10;                                                      
+        *out_str[i] = rechteziffer + 48;                                         
+        in /= 10;                                                                
+    }                                                                                
+
+    return 0;                                                                        
+}                   
+int t1 = time(NULL);
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
 
@@ -274,6 +295,17 @@ start:
 	while (true) { // give user 10ms for input
 		timeanf = clock();
 		
+        // Uhrzeit block
+        char * timer(int t1, int t2){
+            int tdiff = t2-t1;
+            char *cake = "";
+            itoa(tdiff, cake);
+            return cake;
+        }
+        char * zeitausgabe = timer(t1,t2);
+        tb_print(10,10,zeitausgabe);
+        // Uhrzeit block ende
+
 		tb_peek_event(&input, 10);
 		switch (input.type) {
 		case TB_EVENT_KEY:
