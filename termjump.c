@@ -15,6 +15,29 @@
 #define MONSTER_Y 4
 
 int x = 0, y = 0, z = 0, steigen = 1, neu=0, answer;
+
+// Integer to ASCII Funktion
+int my_itoa (int in, char **out_str)                                                     
+{                                                                                        
+    int i, count = in, countziffern = 0, rechteziffer;                                   
+
+    while (count > 0) {                                                                  
+        count /= 10;                                                                     
+        countziffern++;                                                                  
+    }                                                                                
+
+    *out_str[countziffern] = '\0';                                                   
+
+    for (i = countziffern - 1; i >= 0; i--)                                          
+    {                                                                                
+        rechteziffer = in % 10;                                                      
+        *out_str[i] = rechteziffer + 48;                                         
+        in /= 10;                                                                
+    }                                                                                
+
+    return 0;                                                                        
+}                   
+    
 static unsigned int player_x = GAME_X/2;
 static unsigned int player_y = GAME_Y - 1;
 
@@ -47,8 +70,8 @@ static void tb_print (int posx, int posy, char *text)
 	for (int i = 0; text[i] != '\0'; i++)
 	{
 		cellarray[i].ch = text[i];	
-		cellarray[i].fg = TB_DEFAULT;
-		cellarray[i].bg = TB_YELLOW;
+		cellarray[i].fg = TB_WHITE;
+		cellarray[i].bg = TB_BLACK;
 
 		tb_put_cell(posx + i, posy, &cellarray[i]);
 
@@ -288,12 +311,20 @@ int main(void)
 
 	re_init();
 
+    time_t t1 = time(NULL);
 	// Game loop
 
 
 	while (true) { // give user 10ms for input
 		timeanf = clock();
 		
+        // Uhrzeit block
+        char kuchen[20];
+        time_t t2 = time(NULL);
+        sprintf(kuchen,"Spielzeit %li:%li", (t2-t1)/60,(t2-t1)%60 );
+        tb_print(10,10,kuchen);
+        // Uhrzeit block ende
+
 		tb_peek_event(&input, 10);
 		switch (input.type) {
 		case TB_EVENT_KEY:

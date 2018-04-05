@@ -1,3 +1,5 @@
+#include<stdlib.h>
+#include<stdio.h>
 int my_itoa (int in, char **out_str)
 {
 	int i, count = in, countziffern = 0, rechteziffer;
