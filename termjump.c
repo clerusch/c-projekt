@@ -17,6 +17,7 @@
 
 int x = 0, y = 0, z = 0, steigen = 1, neu=0, answer;
 
+time_t t3 = 0;
 struct tb_event input, leave;
 clock_t timeanf;
 time_t t1, t2;
@@ -290,6 +291,10 @@ static int game_over (void)
 						answer = handle_key(leave.key);
 						if (answer == 2) 
 						{		
+                            if (t2-t1 > t3){
+                                t3 = t2-t1;
+                            }
+
 							re_init();
 							return 0;
 						}			
@@ -358,8 +363,7 @@ int main(void)
 	
 	re_init();
 	t1 = time(NULL);
-
-
+    
 	// Game loop
 
 	while (true) { // give user 10ms for input
@@ -370,6 +374,11 @@ int main(void)
 		t2 = time(NULL);
 		sprintf(kuchen,"Spielzeit %li:%li", (t2-t1)/60,(t2-t1)%60);
 		tb_print(10,10,kuchen);
+        char cake [20];
+        sprintf(cake, "Highscore: %li:%li", t3/60, t3%60);
+        tb_print(55,10,cake);
+
+
 		// Uhrzeit block ende
 
 		tb_peek_event(&input, 10);
