@@ -309,9 +309,9 @@ int main(void)
 	clock_t timeanf;
 	double timediff, random, counter1 = 0, counter2 = 0;
 
+    time_t t1 = time(NULL);
 	re_init();
 
-    time_t t1 = time(NULL);
 	// Game loop
 
 
@@ -381,6 +381,7 @@ int main(void)
 							answer = handle_key(leave.key);
 							if (answer == 2) 
 							{		
+                                t1 = time(NULL);
 								re_init();
 								neu = 1;
 
