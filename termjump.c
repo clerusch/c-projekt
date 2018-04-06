@@ -1,6 +1,6 @@
-//Basic Terminal-Jump&Run
-//Authors: Theresa Johanni, Clemens Schumann, David Reuschenberg
-//After a template by Leonard König
+/* Basic Terminal-Jump&Run 
+ * Authors: Theresa Johanni, Clemens Schumann, David Reuschenberg 
+ * After a template by Leonard König */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -62,7 +62,7 @@ int my_itoa (int in, char **out_str)
     for (i = countziffern - 1; i >= 0; i--)                                          
     {                                                                                
         rechteziffer = in % 10;                                                      
-        *out_str[i] = rechteziffer + 48;                                         
+        *out_str[i] = rechteziffer + '0';                                         
         in /= 10;                                                                
     }                                                                                
 
@@ -111,29 +111,29 @@ static void update_obst(void)
 int update_jump(void)
 {
 
-			if (z >= 1 && z < 6) 
-			{
-				for (x = 0; x < GAME_X - 1; x++) {
-					for (y = 1; y < GAME_Y; y++) {
-						if (playerpos[y][x])
-						{
-							playerpos[y][x] = false;
-							playerpos[y-1][x] = true;	
-							tb_put_cell(x, y, &empty);
-							tb_put_cell(x, y-1, &player);
-						}
-					}
+	if (z >= 1 && z < 6) 
+	{
+		for (x = 0; x < GAME_X - 1; x++) {
+			for (y = 1; y < GAME_Y; y++) {
+				if (playerpos[y][x])
+				{
+					playerpos[y][x] = false;
+					playerpos[y-1][x] = true;	
+					tb_put_cell(x, y, &empty);
+					tb_put_cell(x, y-1, &player);
 				}
-				z++;
 			}
-			 
-			if (z == 6)
-			{
-			z++;
-		       	return 0;
-			}
+		}
+		z++;
+	}
 
-			else return 1;
+	if (z == 6)
+	{
+		z++;
+		return 0;
+	}
+
+	else return 1;
 }
 
 //let player move down again to ground level
@@ -213,7 +213,9 @@ static int handle_key(uint16_t key)
 		for (y = 0; y < GAME_Y; y++)
 		{
 			if (playerpos[y][1] == true)
+			{
 				;
+			}
 			else
 			{
 				for (x = 1; x < GAME_X - 1; x++)
@@ -294,14 +296,14 @@ static int game_over (void)
 						answer = handle_key(leave.key);
 						if (answer == 2) 
 						{		
-                            if (t2-t1 > t3){
-                                t3 = t2-t1;
-                            }
+							if (t2-t1 > t3){
+								t3 = t2-t1;
+							}
 
 							re_init();
 							return 0;
 						}			
-						if (answer == 1) 
+						else if (answer == 1) 
 						{
 							return 1;
 						}
@@ -367,9 +369,6 @@ int main(void)
 	re_init();
 	t1 = time(NULL);
 
-
-
-    
 	// Game loop
 
 	while (true) { // give user 10ms for input
@@ -380,9 +379,9 @@ int main(void)
 		t2 = time(NULL);
 		sprintf(kuchen,"Spielzeit %li:%li", (t2-t1)/60,(t2-t1)%60);
 		tb_print(10,10,kuchen);
-        char cake [20];
-        sprintf(cake, "Highscore: %li:%li", t3/60, t3%60);
-        tb_print(55,10,cake);
+		char cake [20];
+		sprintf(cake, "Highscore: %li:%li", t3/60, t3%60);
+		tb_print(55,10,cake);
 
 
 		// Uhrzeit block ende
