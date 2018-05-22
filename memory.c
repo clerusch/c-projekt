@@ -40,6 +40,11 @@ int main(void)
 	struct memlist* firstblock = (void*)&ram[0];
 	printf("%d\n", firstblock -> freespace);
 
+	if (byte_count < currentblock -> freespace)
+		return firstblock;
+	else 
+
+
 	return 0;
 }
 	
