@@ -4,27 +4,31 @@
 
 char ram[MEM_SIZE];
 
-struct node 
+struct memlist 
 {
-	struct node* next;
+	struct memlist* next;
 	int freespace;
 };
 
-struct node memory_list;
+//struct memlist memory_list;
 
-struct node* head = &memory_list;
 
-void memory_init();
+void memory_init()
 {
-	for (int i = 0; i < MEM_SIZE; i++)
-	{
-		ram[i] = 0;
-	}
+
+	struct memlist* pmb = (void*)&ram[0];
+
+	pmb -> freespace = 100;
+
 	
 }
 
+/*
 void* mem_alloc(size_t byte_count)
 {
+
+}
+*/
 	
 
 
@@ -32,6 +36,12 @@ void* mem_alloc(size_t byte_count)
 
 int main(void)
 {
+	memory_init();
+	struct memlist* firstblock = (void*)&ram[0];
+	printf("%d\n", firstblock -> freespace);
+
+	return 0;
+}
 	
 
 
